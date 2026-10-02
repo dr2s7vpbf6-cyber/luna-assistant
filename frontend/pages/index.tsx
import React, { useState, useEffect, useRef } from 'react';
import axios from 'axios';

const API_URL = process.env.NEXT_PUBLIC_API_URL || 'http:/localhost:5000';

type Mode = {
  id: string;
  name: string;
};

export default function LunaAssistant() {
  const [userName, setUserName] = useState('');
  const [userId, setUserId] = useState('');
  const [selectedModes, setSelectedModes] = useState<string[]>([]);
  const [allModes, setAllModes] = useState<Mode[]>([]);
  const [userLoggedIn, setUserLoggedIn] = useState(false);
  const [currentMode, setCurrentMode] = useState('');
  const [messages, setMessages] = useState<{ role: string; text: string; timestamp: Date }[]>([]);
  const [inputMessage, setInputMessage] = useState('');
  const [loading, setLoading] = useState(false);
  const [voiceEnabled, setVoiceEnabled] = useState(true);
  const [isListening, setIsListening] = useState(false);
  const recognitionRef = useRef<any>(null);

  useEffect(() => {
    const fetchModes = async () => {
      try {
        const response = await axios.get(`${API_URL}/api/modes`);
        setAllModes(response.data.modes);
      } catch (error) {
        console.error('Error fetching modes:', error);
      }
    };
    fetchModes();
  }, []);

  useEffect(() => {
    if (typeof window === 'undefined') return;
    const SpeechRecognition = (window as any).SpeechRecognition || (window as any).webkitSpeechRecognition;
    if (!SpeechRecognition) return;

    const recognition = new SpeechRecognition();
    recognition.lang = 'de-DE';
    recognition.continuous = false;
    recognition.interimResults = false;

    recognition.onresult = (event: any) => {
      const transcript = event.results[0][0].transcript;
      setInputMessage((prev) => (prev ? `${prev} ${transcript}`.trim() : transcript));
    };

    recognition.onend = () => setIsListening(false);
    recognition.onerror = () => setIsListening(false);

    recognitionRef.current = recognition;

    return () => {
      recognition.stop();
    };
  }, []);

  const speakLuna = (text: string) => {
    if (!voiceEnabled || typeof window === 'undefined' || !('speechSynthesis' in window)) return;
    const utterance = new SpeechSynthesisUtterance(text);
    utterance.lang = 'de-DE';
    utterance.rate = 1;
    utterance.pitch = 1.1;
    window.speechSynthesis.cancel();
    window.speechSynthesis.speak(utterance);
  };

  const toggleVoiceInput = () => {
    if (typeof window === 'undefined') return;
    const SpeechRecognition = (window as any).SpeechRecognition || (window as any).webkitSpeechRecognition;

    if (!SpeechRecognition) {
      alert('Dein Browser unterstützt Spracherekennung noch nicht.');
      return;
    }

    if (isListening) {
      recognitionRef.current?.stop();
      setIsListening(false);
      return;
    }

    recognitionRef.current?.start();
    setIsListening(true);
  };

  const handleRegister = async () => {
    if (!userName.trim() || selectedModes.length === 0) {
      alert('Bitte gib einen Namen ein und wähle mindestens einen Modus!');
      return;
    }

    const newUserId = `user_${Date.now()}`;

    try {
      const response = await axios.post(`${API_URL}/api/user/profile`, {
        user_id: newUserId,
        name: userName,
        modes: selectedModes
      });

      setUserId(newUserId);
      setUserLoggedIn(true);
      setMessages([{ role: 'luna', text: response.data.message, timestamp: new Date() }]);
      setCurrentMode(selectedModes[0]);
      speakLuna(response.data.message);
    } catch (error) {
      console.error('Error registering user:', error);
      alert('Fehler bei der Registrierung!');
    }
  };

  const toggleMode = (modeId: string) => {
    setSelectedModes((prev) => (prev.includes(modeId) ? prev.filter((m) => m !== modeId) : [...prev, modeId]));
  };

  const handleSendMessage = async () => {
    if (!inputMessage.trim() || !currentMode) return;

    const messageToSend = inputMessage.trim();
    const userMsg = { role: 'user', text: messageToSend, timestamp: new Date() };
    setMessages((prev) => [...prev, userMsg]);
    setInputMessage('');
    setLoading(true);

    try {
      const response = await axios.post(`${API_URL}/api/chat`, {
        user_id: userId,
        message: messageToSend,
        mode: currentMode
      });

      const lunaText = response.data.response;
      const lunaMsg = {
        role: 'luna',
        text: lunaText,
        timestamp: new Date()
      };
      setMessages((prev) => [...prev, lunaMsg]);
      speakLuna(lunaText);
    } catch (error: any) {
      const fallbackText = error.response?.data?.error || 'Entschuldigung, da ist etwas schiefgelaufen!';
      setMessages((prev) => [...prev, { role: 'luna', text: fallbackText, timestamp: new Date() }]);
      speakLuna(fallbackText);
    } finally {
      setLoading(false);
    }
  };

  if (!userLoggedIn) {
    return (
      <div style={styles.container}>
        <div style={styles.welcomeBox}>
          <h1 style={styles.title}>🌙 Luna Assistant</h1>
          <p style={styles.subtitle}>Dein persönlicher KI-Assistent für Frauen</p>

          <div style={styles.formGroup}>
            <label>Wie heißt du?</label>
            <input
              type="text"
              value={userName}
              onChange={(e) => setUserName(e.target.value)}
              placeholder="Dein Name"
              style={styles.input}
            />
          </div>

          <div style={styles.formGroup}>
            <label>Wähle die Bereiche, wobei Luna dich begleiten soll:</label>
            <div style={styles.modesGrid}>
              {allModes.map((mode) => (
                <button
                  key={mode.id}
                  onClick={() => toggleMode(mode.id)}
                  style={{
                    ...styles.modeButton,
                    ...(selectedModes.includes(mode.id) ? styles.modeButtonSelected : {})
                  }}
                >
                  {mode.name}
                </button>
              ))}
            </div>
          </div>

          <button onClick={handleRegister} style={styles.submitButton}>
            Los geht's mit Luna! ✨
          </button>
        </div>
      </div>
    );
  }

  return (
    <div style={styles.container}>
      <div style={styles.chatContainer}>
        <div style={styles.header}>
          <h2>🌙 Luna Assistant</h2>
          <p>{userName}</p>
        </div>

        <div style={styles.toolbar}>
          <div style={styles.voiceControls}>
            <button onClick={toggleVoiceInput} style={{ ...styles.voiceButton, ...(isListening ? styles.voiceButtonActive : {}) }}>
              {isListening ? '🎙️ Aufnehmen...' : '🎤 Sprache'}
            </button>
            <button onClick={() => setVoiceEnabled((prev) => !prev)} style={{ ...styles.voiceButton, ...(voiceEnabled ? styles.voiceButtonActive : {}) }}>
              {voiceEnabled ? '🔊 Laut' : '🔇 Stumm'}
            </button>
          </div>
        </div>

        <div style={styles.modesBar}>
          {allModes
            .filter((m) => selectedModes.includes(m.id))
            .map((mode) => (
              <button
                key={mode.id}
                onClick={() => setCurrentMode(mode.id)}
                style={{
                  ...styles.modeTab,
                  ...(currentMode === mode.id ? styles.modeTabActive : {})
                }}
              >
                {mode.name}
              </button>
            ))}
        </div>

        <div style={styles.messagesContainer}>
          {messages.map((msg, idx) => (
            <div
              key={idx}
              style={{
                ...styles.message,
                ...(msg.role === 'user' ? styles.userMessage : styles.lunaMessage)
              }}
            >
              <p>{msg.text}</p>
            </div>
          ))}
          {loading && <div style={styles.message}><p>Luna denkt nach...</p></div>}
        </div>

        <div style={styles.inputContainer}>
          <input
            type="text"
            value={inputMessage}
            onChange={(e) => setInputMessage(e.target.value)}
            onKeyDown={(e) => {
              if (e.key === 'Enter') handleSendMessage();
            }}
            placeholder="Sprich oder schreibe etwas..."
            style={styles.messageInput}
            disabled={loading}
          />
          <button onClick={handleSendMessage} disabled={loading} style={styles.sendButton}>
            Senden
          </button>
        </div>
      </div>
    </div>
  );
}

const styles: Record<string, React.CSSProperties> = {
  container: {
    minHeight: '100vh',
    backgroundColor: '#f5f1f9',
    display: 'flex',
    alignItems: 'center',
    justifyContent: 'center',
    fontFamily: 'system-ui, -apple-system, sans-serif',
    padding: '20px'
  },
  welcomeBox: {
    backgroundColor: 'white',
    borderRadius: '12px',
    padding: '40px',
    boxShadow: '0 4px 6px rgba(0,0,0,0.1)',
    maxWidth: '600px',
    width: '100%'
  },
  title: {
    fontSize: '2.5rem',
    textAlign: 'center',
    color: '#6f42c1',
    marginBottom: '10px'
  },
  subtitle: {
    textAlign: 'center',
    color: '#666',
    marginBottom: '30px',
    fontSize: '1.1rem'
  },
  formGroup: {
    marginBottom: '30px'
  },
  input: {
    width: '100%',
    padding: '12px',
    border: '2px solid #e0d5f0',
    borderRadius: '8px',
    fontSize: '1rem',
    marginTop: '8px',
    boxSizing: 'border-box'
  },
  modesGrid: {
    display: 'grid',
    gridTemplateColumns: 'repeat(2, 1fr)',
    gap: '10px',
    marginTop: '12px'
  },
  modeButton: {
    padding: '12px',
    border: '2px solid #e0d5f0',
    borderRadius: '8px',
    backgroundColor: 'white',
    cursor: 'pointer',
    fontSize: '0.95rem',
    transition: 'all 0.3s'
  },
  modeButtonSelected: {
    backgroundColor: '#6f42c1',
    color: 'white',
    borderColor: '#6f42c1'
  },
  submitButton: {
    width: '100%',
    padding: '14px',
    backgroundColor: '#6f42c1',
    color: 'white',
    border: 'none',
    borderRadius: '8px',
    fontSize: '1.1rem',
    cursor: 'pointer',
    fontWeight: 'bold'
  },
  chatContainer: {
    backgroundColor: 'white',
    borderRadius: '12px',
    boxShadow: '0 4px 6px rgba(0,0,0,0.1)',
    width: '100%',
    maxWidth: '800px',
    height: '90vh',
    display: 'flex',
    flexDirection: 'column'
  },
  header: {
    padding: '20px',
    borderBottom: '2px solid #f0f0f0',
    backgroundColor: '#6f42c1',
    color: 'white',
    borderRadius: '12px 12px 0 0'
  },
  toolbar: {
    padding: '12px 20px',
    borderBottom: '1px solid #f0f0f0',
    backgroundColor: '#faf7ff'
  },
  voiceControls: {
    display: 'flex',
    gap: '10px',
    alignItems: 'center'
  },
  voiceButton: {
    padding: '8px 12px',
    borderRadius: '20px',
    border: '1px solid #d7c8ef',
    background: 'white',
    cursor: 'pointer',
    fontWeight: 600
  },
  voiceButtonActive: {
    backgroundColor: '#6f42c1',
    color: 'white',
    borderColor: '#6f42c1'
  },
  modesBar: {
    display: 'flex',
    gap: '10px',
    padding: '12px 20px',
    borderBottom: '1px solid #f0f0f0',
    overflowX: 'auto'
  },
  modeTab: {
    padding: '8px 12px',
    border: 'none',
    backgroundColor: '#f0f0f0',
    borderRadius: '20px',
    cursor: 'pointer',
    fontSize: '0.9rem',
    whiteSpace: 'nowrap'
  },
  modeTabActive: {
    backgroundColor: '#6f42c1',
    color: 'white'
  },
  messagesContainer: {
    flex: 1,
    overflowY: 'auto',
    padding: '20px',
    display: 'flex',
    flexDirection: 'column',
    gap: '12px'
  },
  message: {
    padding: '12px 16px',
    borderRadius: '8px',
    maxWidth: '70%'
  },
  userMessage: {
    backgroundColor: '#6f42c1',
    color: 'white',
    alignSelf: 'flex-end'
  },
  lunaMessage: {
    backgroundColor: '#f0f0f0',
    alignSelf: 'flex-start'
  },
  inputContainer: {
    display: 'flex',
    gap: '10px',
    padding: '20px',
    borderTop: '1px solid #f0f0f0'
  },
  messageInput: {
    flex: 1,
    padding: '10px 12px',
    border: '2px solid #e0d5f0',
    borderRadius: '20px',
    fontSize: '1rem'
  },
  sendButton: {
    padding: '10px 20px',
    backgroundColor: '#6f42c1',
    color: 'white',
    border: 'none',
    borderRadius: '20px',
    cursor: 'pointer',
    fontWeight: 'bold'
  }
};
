@@ -1,0 +1,166 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from dotenv import load_dotenv
+from datetime import datetime
+
+load_dotenv()
+
+app = Flask(__name__)
+CORS(app)
+
+LUNA_MODES = {
+    "outfit": "👗 Outfit & Style",
+    "shopping": "🛍️ Shopping & Sales",
+    "fitness": "💪 Fitness & Gesundheit",
+    "career": "💼 Karriere & Networking",
+    "mindfulness": "🧘 Mindfulness & Selbstliebe",
+    "education": "📚 Bildung & Wissen",
+    "relationships": "👥 Beziehungen & Community",
+    "finance": "💰 Finanzen & Sparen",
+    "productivity": "📅 Alltag & Produktivität"
+}
+
+user_profiles = {}
+
+@app.route("/api/health", methods=["GET"])
+def health():
+    return jsonify({"status": "Luna is online ✨"})
+
+@app.route("/api/modes", methods=["GET"])
+def get_modes():
+    return jsonify({
+        "modes": [{"id": k, "name": v} for k, v in LUNA_MODES.items()]
+    })
+
+@app.route("/api/assistant/voice", methods=["GET"])
+def get_voice_status():
+    return jsonify({
+        "supported": True,
+        "features": [
+            "speech_to_text",
+            "text_to_speech",
+            "voice_commands",
+            "wake_word_ready"
+        ],
+        "language": "de-DE"
+    })
+
+@app.route("/api/user/profile", methods=["POST"])
+def create_user_profile():
+    data = request.json
+    user_id = data.get("user_id")
+    selected_modes = data.get("modes", [])
+    name = data.get("name", "Friend")
+
+    user_profiles[user_id] = {
+        "name": name,
+        "selected_modes": selected_modes,
+        "created_at": datetime.now().isoformat(),
+        "preferences": {"voice_enabled": True}
+    }
+
+    return jsonify({
+        "success": True,
+        "message": f"Hallo {name}! Luna ist bereit, dich zu begleiten! 🌙",
+        "profile": user_profiles[user_id]
+    }), 201
+
+@app.route("/api/user/<user_id>/profile", methods=["GET"])
+def get_user_profile(user_id):
+    if user_id not in user_profiles:
+        return jsonify({"error": "User not found"}), 404
+    return jsonify(user_profiles[user_id])
+
+@app.route("/api/user/<user_id>/modes", methods=["PUT"])
+def update_user_modes(user_id):
+    if user_id not in user_profiles:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.json
+    user_profiles[user_id]["selected_modes"] = data.get("modes", [])
+    return jsonify({
+        "success": True,
+        "message": "Deine Begleitungs-Modi wurden aktualisiert!",
+        "selected_modes": user_profiles[user_id]["selected_modes"]
+    })
+
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    data = request.json
+    user_id = data.get("user_id")
+    message = data.get("message")
+    mode = data.get("mode")
+
+    if user_id not in user_profiles:
+        return jsonify({"error": "User not found"}), 404
+
+    user = user_profiles[user_id]
+
+    if mode not in user["selected_modes"]:
+        return jsonify({
+            "error": f"Du hast den Modus '{mode}' nicht aktiviert.",
+            "hint": "Wähle zuerst deine Begleitungs-Modi in den Einstellungen."
+        }), 400
+
+    response = generate_luna_response(user, message, mode)
+    return jsonify({
+        "user_name": user["name"],
+        "mode": LUNA_MODES.get(mode, mode),
+        "response": response,
+        "timestamp": datetime.now().isoformat()
+    })
+
+
+def generate_luna_response(user, message, mode):
+    message = message or ""
+    lower = message.lower()
+
+    if "outfit" in lower or mode == "outfit":
+        return "Sicher! Lass uns heute deinen Stil aufbauen. Ich kann dir 3 Looks, passende Farben und ein Outfit für deinen Anlass vorschlagen."
+    if "shopping" in lower or mode == "shopping":
+        return "Ich helfe dir beim Einkaufen. Ich kann dir Deals, passende Produkte und einen smarten Einkaufsplan für deinen Stil erstellen."
+    if "fitness" in lower or mode == "fitness":
+        return "Wir machen dein Training aktiv und realistisch. Ich kann dir einen kurzen Plan, Recovery-Tipps und Motivation für deine Ziele geben."
+    if "karriere" in lower or mode == "career":
+        return "Wir fokussieren auf deine nächste Stufe. Ich kann dir bei Präsentation, CV, Bewerbung und Networking helfen."
+    if "meditation" in lower or mode == "mindfulness":
+        return "Nimm dir einen Moment für dich. Ich kann dir kleine Atemübungen, Affirmationen und entspannende Routinen für deinen Stressabbau geben."
+    if "lernen" in lower or mode == "education":
+        return "Lernen wird einfacher mit einem klaren Plan. Ich kann dir Lernziele, Studienpläne und Schritte für neue Skills vorschlagen."
+    if "beziehung" in lower or mode == "relationships":
+        return "Beziehungen brauchen Aufmerksamkeit und Klarheit. Ich kann dir helfen, Grenzen, Gespräche und Entscheidungen für deine Beziehungen zu reflektieren."
+    if "geld" in lower or mode == "finance":
+        return "Wir schauen uns deine Finanzen bewusst an. Ich kann dir Budgetideen, Sparpläne und einfache Wege zur finanziellen Sicherheit zeigen."
+    if "tag" in lower or mode == "productivity":
+        return "Lass uns deinen Tag einfacher machen. Ich kann dir eine Tagesroutine, Prioritäten und Erinnerungstipps erstellen."
+
+    mode_responses = {
+        "outfit": "Ich helfe dir gerne mit Outfit-Tipps! Was für einen Anlass brauchst du?",
+        "shopping": "Lust auf Shopping? Lass mich die besten Deals für dich finden! Wonach suchst du?",
+        "fitness": "Let's go! Ich helfe dir mit deinem Trainingsplan. Was interessiert dich?",
+        "career": "Deine Karriere ist wichtig! Lass mich dir helfen. Was beschäftigt dich?",
+        "mindfulness": "Lass uns dich selbst verwöhnen. Wie fühlst du dich gerade?",
+        "education": "Bildung ist Macht! Was möchtest du lernen?",
+        "relationships": "Beziehungen sind wichtig. Ich bin für dich da. Erzähl mir mehr.",
+        "finance": "Finanzen meistern! Lass mich dir helfen. Was willst du wissen?",
+        "productivity": "Lass uns produktiv sein! Wie kann ich dir helfen?"
+    }
+    return mode_responses.get(mode, f"Ich höre dir zu... {message}")
+
+
+@app.route("/api/notifications", methods=["POST"])
+def create_notification():
+    data = request.json
+    return jsonify({
+        "success": True,
+        "notification": {
+            "user_id": data.get("user_id"),
+            "message": data.get("message"),
+            "mode": data.get("mode"),
+            "sent_at": datetime.now().isoformat()
+        }
+    })
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

@@ -1,51 +1,65 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-PIPFILE.lock
-.env
-.venv
+# 🌙 Luna Assistant
 
-# Node
-node_modules/
-.next/
-out/
-build/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-.next
-.DS_Store
-*.pem
+Ein intelligenter, persönlicher KI-Assistent speziell für Frauen. Luna begleitet dich in verschiedenen Lebensbereichen und passt sich deinen Bedürfnissen an.
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
+## Hauptfunktionen
+
+- Persönliche Auswahl von Begleitungs-Modi
+- Sprachassistent mit Spracheingabe und Sprachausgabe
+- Benachrichtigungen und Erinnerungen
+- Chat-basierte Unterstützung in Bereichen wie Style, Shopping, Fitness, Finanzen, Karriere und Selbstpflege
+
+## Verfügbare Bereiche
+
+- 👗 Outfit & Style
+- 🛍️ Shopping & Sales
+- 💪 Fitness & Gesundheit
+- 💼 Karriere & Networking
+- 🧘 Mindfulness & Selbstliebe
+- 📚 Bildung & Wissen
+- 👥 Beziehungen & Community
+- 💰 Finanzen & Sparen
+- 📅 Alltag & Produktivität
+
+## Tech Stack
+
+- Frontend: React / Next.js
+- Backend: Python Flask
+- AI: Erweiterbar für OpenAI / lokale Modelle
+- Voice: Browser SpeechRecognition + SpeechSynthesis
+- Database: PostgreSQL (für zukünftige Versionen)
+
+## Installation
+
+```bash
+git clone https://github.com/dr2s7vpbf6-cyber/luna-assistant.git
+cd luna-assistant
+
+# Backend
+cd backend
+pip install -r requirements.txt
+python app.py
+
+# Frontend
+cd ../frontend
+npm install
+npm run dev
+```
+
+## Nutzung
+
+1. Profil erstellen
+2. Lebensbereiche auswählen
+3. Mit Luna chatten
+4. Sprachassistent aktivieren
+5. Benachrichtigungen und Erinnerungen konfigurieren
+
+## Lizenz
+
+MIT
+
+### Voice Assistant
+
+Der persönliche Sprachassistent wird im Frontend im Browser unterstützt. Dabei werden Sprach-Eingabe und Sprachausgabe verwendet, damit Luna wie eine echte Assistentin wirkt.
+
+Das Projekt ist bewusst so gebaut, dass es später einfach mit echten AI-Services erweitert werden kann.
